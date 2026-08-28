@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         String
+  createdAt    DateTime @default(now())
+
+  patientProfile PatientProfile?
+  doctorProfile  DoctorProfile?
+  wallet         Wallet?
+
+  consultsAsPatient Consult[] @relation("PatientConsults")
+  consultsAsDoctor  Consult[] @relation("DoctorConsults")
+  messages          Message[]
+  ratingsGiven      Rating[]  @relation("RatingsGiven")
+  ratingsReceived   Rating[]  @relation("RatingsReceived")
+  payouts           Payout[]
+  ledgerEntries     LedgerEntry[]
+}
+
+model PatientProfile {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lat           Float?
+  lng           Float?
+  city          String?
+  area          String?
+  locationLabel String?
+}
+
+model DoctorProfile {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialty       String
+  bio             String
+  yearsExperience Int
+  consultFeeKobo  Int
+  status          String  @default("OFFLINE")
+  lat             Float
+  lng             Float
+  city            String
+  area            String
+  locationLabel   String
+  ratingAvg       Float   @default(0)
+  ratingCount     Int     @default(0)
+}
+
+model Hospital {
+  id                String  @id @default(cuid())
+  name              String
+  type              String
+  lat               Float
+  lng               Float
+  city              String
+  area              String
+  address           String
+  phone             String
+  emergencyCapable  Boolean @default(false)
+  hoursNote         String?
+}
+
+model Consult {
+  id              String    @id @default(cuid())
+  patientUserId   String
+  patient         User      @relation("PatientConsults", fields: [patientUserId], references: [id])
+  doctorUserId    String
+  doctor          User      @relation("DoctorConsults", fields: [doctorUserId], references: [id])
+  status          String    @default("AWAITING_PAYMENT")
+  feeKobo         Int
+  platformFeeKobo Int
+  doctorNetKobo   Int
+  patientLat      Float?
+  patientLng      Float?
+  createdAt       DateTime  @default(now())
+  paidAt          DateTime?
+  completedAt     DateTime?
+
+  payment  Payment?
+  messages Message[]
+  rating   Rating?
+  ledger   LedgerEntry[]
+}
+
+model Payment {
+  id         String   @id @default(cuid())
+  consultId  String   @unique
+  consult    Consult  @relation(fields: [consultId], references: [id], onDelete: Cascade)
+  amountKobo Int
+  method     String   @default("DEMO")
+  reference  String   @unique
+  status     String   @default("SUCCESS")
+  paidAt     DateTime @default(now())
+}
+
+model Message {
+  id           String   @id @default(cuid())
+  consultId    String
+  consult      Consult  @relation(fields: [consultId], references: [id], onDelete: Cascade)
+  senderUserId String
+  sender       User     @relation(fields: [senderUserId], references: [id])
+  body         String
+  createdAt    DateTime @default(now())
+
+  @@index([consultId, createdAt])
+}
+
+model Rating {
+  id            String   @id @default(cuid())
+  consultId     String   @unique
+  consult       Consult  @relation(fields: [consultId], references: [id], onDelete: Cascade)
+  patientUserId String
+  patient       User     @relation("RatingsGiven", fields: [patientUserId], references: [id])
+  doctorUserId  String
+  doctor        User     @relation("RatingsReceived", fields: [doctorUserId], references: [id])
+  stars         Int
+  comment       String?
+  createdAt     DateTime @default(now())
+}
+
+model Wallet {
+  id                 String @id @default(cuid())
+  doctorUserId       String @unique
+  doctor             User   @relation(fields: [doctorUserId], references: [id], onDelete: Cascade)
+  pendingKobo        Int    @default(0)
+  availableKobo      Int    @default(0)
+  paidOutKobo        Int    @default(0)
+  lifetimeGrossKobo  Int    @default(0)
+  lifetimeNetKobo    Int    @default(0)
+  lifetimeFeeKobo    Int    @default(0)
+}
+
+model Payout {
+  id           String   @id @default(cuid())
+  doctorUserId String
+  doctor       User     @relation(fields: [doctorUserId], references: [id])
+  amountKobo   Int
+  status       String   @default("DEMO_COMPLETED")
+  createdAt    DateTime @default(now())
+  ledger       LedgerEntry[]
+}
+
+model LedgerEntry {
+  id           String   @id @default(cuid())
+  doctorUserId String?
+  doctor       User?    @relation(fields: [doctorUserId], references: [id])
+  consultId    String?
+  consult      Consult? @relation(fields: [consultId], references: [id])
+  payoutId     String?
+  payout       Payout?  @relation(fields: [payoutId], references: [id])
+  type         String
+  account      String
+  direction    String
+  amountKobo   Int
+  description  String
+  createdAt    DateTime @default(now())
+
+  @@index([doctorUserId, createdAt])
+  @@index([consultId])
+}

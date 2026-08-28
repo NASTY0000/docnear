@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f6f4ee;
+  --ink: #152028;
+  --muted: #5b6670;
+}
+
+.dark {
+  --bg: #071c1d;
+  --ink: #eef6f6;
+  --muted: #9db0b0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.bg-mesh {
+  background-image:
+    radial-gradient(1200px 500px at 10% -10%, rgba(36, 145, 143, 0.16), transparent 55%),
+    radial-gradient(800px 400px at 100% 0%, rgba(226, 75, 63, 0.08), transparent 45%);
+}
+
+.dark .bg-mesh {
+  background-image:
+    radial-gradient(1200px 500px at 10% -10%, rgba(62, 174, 171, 0.16), transparent 55%),
+    radial-gradient(800px 400px at 100% 0%, rgba(240, 113, 103, 0.1), transparent 45%);
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tide-400 focus-visible:ring-offset-2
+      disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-tide-800 text-white hover:bg-tide-700 dark:bg-tide-400 dark:text-tide-950 dark:hover:bg-tide-300;
+  }
+  .btn-emergency {
+    @apply btn bg-coral-600 text-white hover:bg-coral-700 shadow-lift;
+  }
+  .btn-secondary {
+    @apply btn border border-tide-200 bg-white text-tide-900 hover:bg-tide-50
+      dark:border-tide-700 dark:bg-tide-900 dark:text-sand-50 dark:hover:bg-tide-800;
+  }
+  .btn-ghost {
+    @apply btn text-tide-800 hover:bg-tide-100 dark:text-sand-100 dark:hover:bg-tide-800;
+  }
+  .input {
+    @apply w-full rounded-xl border border-tide-200 bg-white px-3 py-2.5 text-sm text-ink-900
+      placeholder:text-ink-700/40 shadow-sm
+      focus:border-tide-600 focus:outline-none focus:ring-2 focus:ring-tide-200
+      dark:border-tide-700 dark:bg-tide-950 dark:text-sand-50 dark:placeholder:text-tide-400;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-tide-700 dark:text-tide-300;
+  }
+  .card {
+    @apply rounded-2xl border border-tide-100 bg-white shadow-lift
+      dark:border-tide-800 dark:bg-tide-900/80 dark:shadow-lift-dark;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+}
+
+.disclaimer-banner {
+  @apply rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-950
+    dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100;
+}
