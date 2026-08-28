@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireDoctor } from "@/lib/auth";
 import { SPECIALTIES } from "@/lib/constants";
 import { errorMessage } from "@/lib/errors";
-import { findPreset } from "@/lib/geo";
+import { findPreset, isLaunchCity, isValidMdcn, normalizeMdcn } from "@/lib/geo";
 import { nairaToKobo } from "@/lib/money";
 import { updateDoctorProfile, updateDoctorStatus } from "@/lib/doctors";
 
@@ -24,16 +24,20 @@ export async function saveDoctorProfileAction(_prev: unknown, formData: FormData
     const years = Number(formData.get("yearsExperience") || 0);
     const feeNaira = Number(formData.get("feeNaira") || 0);
     const presetId = String(formData.get("presetId") || "");
+    const mdcnNumber = String(formData.get("mdcnNumber") || "");
     if (!SPECIALTIES.includes(specialty as never)) return { error: "Choose a specialty." };
     if (bio.trim().length < 20) return { error: "Bio should be at least 20 characters." };
     if (!Number.isFinite(years) || years < 0 || years > 60) return { error: "Enter years of experience." };
     if (!Number.isFinite(feeNaira) || feeNaira < 1000) return { error: "Fee must be at least ₦1,000." };
+    if (!isValidMdcn(mdcnNumber)) return { error: "Enter a valid MDCN registration number." };
     const preset = presetId ? findPreset(presetId) : undefined;
+    if (preset && !isLaunchCity(preset.city)) return { error: "Practice area must be in Lagos for now." };
     await updateDoctorProfile(doctor.id, {
       specialty,
       bio: bio.trim(),
       yearsExperience: years,
       consultFeeKobo: nairaToKobo(feeNaira),
+      mdcnNumber: normalizeMdcn(mdcnNumber),
       ...(preset
         ? {
             city: preset.city,

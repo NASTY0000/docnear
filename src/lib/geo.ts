@@ -7,6 +7,8 @@ export type AreaPreset = {
   lng: number;
 };
 
+export const LAUNCH_CITY = "Lagos";
+
 export const AREA_PRESETS: AreaPreset[] = [
   { id: "lagos-ikeja", city: "Lagos", area: "Ikeja", label: "Ikeja, Lagos", lat: 6.6018, lng: 3.3515 },
   { id: "lagos-vi", city: "Lagos", area: "Victoria Island", label: "Victoria Island, Lagos", lat: 6.4281, lng: 3.4219 },
@@ -23,16 +25,25 @@ export const AREA_PRESETS: AreaPreset[] = [
   { id: "ph-transamadi", city: "Port Harcourt", area: "Trans Amadi", label: "Trans Amadi, Port Harcourt", lat: 4.8156, lng: 7.0498 },
 ];
 
+export const LAGOS_PRESETS = AREA_PRESETS.filter((a) => a.city === LAUNCH_CITY);
+
 export const CITIES = ["Lagos", "Abuja", "Port Harcourt"] as const;
+export const LIVE_CITIES = [LAUNCH_CITY] as const;
 
 export function findPreset(id: string): AreaPreset | undefined {
   return AREA_PRESETS.find((a) => a.id === id);
 }
 
-export function nearestPreset(lat: number, lng: number): AreaPreset {
-  let best = AREA_PRESETS[0];
+export function isLaunchCity(city: string) {
+  return city === LAUNCH_CITY;
+}
+
+export function nearestPreset(lat: number, lng: number, opts?: { city?: string }): AreaPreset {
+  const pool = opts?.city ? AREA_PRESETS.filter((a) => a.city === opts.city) : AREA_PRESETS;
+  const list = pool.length ? pool : AREA_PRESETS;
+  let best = list[0];
   let bestD = Number.POSITIVE_INFINITY;
-  for (const a of AREA_PRESETS) {
+  for (const a of list) {
     const dLat = a.lat - lat;
     const dLng = a.lng - lng;
     const d = dLat * dLat + dLng * dLng;
@@ -42,4 +53,13 @@ export function nearestPreset(lat: number, lng: number): AreaPreset {
     }
   }
   return best;
+}
+
+export function normalizeMdcn(raw: string) {
+  return raw.trim().toUpperCase().replace(/\s+/g, "");
+}
+
+export function isValidMdcn(raw: string) {
+  const v = normalizeMdcn(raw);
+  return /^[A-Z0-9\/\-]{5,20}$/.test(v);
 }

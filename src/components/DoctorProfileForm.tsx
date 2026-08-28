@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { saveDoctorProfileAction } from "@/app/actions/doctor";
 import { SPECIALTIES } from "@/lib/constants";
-import { AREA_PRESETS } from "@/lib/geo";
+import { LAGOS_PRESETS, LAUNCH_CITY } from "@/lib/geo";
 
 type State = { error?: string; ok?: boolean } | null;
 
@@ -16,6 +16,7 @@ export function DoctorProfileForm({
     yearsExperience: number;
     feeNaira: number;
     presetId: string;
+    mdcnNumber: string;
   };
 }) {
   const [state, action, pending] = useActionState(saveDoctorProfileAction, null as State);
@@ -42,12 +43,17 @@ export function DoctorProfileForm({
         <input className="input" id="feeNaira" name="feeNaira" type="number" min={1000} defaultValue={defaults.feeNaira} />
       </div>
       <div>
-        <label className="label" htmlFor="presetId">Practice area</label>
+        <label className="label" htmlFor="mdcnNumber">MDCN registration number</label>
+        <input className="input" id="mdcnNumber" name="mdcnNumber" required defaultValue={defaults.mdcnNumber} placeholder="e.g. 123456" />
+      </div>
+      <div>
+        <label className="label" htmlFor="presetId">Practice area (Lagos)</label>
         <select className="input" id="presetId" name="presetId" defaultValue={defaults.presetId}>
-          {AREA_PRESETS.map((a) => (
+          {LAGOS_PRESETS.map((a) => (
             <option key={a.id} value={a.id}>{a.label}</option>
           ))}
         </select>
+        <p className="mt-1 text-xs text-ink-700/70 dark:text-tide-400">Live in {LAUNCH_CITY}. Other cities next.</p>
       </div>
       {state?.error ? <p className="text-sm text-coral-700">{state.error}</p> : null}
       {state?.ok ? <p className="text-sm text-emerald-700">Saved.</p> : null}

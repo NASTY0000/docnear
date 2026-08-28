@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { LAUNCH_CITY } from "./geo";
 import { formatDistance, sortByDistance } from "./distance";
 import { DomainError } from "./errors";
 import type { SessionUser } from "./auth";
@@ -18,7 +19,8 @@ export async function listNearbyDoctors(filters: NearbyFilters) {
   const where: {
     specialty?: string;
     status?: string;
-  } = {};
+    city?: string;
+  } = { city: LAUNCH_CITY };
   if (filters.specialty && filters.specialty !== "ALL") {
     where.specialty = filters.specialty;
   }

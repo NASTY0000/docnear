@@ -10,7 +10,7 @@ import {
   hashPassword,
   setSessionCookie,
 } from "@/lib/auth";
-import { findPreset } from "@/lib/geo";
+import { findPreset, isLaunchCity, isValidMdcn, normalizeMdcn } from "@/lib/geo";
 import { SPECIALTIES } from "@/lib/constants";
 import { errorMessage } from "@/lib/errors";
 import { nairaToKobo } from "@/lib/money";
@@ -55,6 +55,7 @@ const registerSchema = z.object({
   bio: z.string().optional(),
   yearsExperience: z.string().optional(),
   feeNaira: z.string().optional(),
+  mdcnNumber: z.string().optional(),
 });
 
 export async function registerAction(_prev: unknown, formData: FormData) {
@@ -70,6 +71,7 @@ export async function registerAction(_prev: unknown, formData: FormData) {
       bio: String(formData.get("bio") || ""),
       yearsExperience: String(formData.get("yearsExperience") || ""),
       feeNaira: String(formData.get("feeNaira") || ""),
+      mdcnNumber: String(formData.get("mdcnNumber") || ""),
     });
 
     const exists = await prisma.user.findUnique({ where: { email: parsed.email } });
@@ -80,6 +82,12 @@ export async function registerAction(_prev: unknown, formData: FormData) {
 
     if (parsed.role === "DOCTOR") {
       if (!preset) return { error: "Choose your practice area." };
+      if (!isLaunchCity(preset.city)) {
+        return { error: "Doctor signup is Lagos-only for now. Abuja and Port Harcourt are next." };
+      }
+      if (!isValidMdcn(parsed.mdcnNumber || "")) {
+        return { error: "Enter a valid MDCN registration number." };
+      }
       if (!parsed.specialty || !SPECIALTIES.includes(parsed.specialty as never)) {
         return { error: "Choose a specialty." };
       }
@@ -111,6 +119,7 @@ export async function registerAction(_prev: unknown, formData: FormData) {
               city: preset.city,
               area: preset.area,
               locationLabel: preset.label,
+              mdcnNumber: normalizeMdcn(parsed.mdcnNumber || ""),
             },
           },
           wallet: { create: {} },

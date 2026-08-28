@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { listEmergency } from "@/lib/emergency";
 import { getPatientLocation } from "@/lib/location";
-import { AREA_PRESETS } from "@/lib/geo";
+import { AREA_PRESETS, LAGOS_PRESETS } from "@/lib/geo";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
 import { DoctorCard } from "@/components/DoctorCard";
@@ -45,7 +45,7 @@ export default async function EmergencyPage({
         </div>
       ) : (
         <div className="mt-4 flex flex-wrap gap-2">
-          {AREA_PRESETS.map((a) => (
+          {LAGOS_PRESETS.map((a) => (
             <a key={a.id} href={`/emergency?preset=${a.id}`} className="btn-secondary text-xs">
               {a.label}
             </a>
@@ -54,7 +54,7 @@ export default async function EmergencyPage({
       )}
 
       <h2 className="mt-8 font-display text-2xl">Nearest emergency-capable hospitals</h2>
-      <p className="text-sm text-ink-700 dark:text-tide-300">Fictional directory for this demo. Call and navigate — no consult fee.</p>
+      <p className="text-sm text-ink-700 dark:text-tide-300">Lagos emergency-capable hospitals. Call 112 or navigate. DocNear is not an ambulance service.</p>
       <div className="mt-3 grid gap-3">
         {data.hospitals.map((h) => (
           <HospitalCard key={h.id} hospital={h} />

@@ -8,7 +8,17 @@ async function main() {
     where: { email: "ada.okonkwo@docnear.ng" },
   });
   if (existing) {
-    console.log("Demo data already present — skip seed.");
+    const docs = await prisma.doctorProfile.findMany({ include: { user: true } });
+    for (const d of docs) {
+      if (!d.mdcnNumber) {
+        const digits = String(100000 + (d.user.email.length * 97) % 900000);
+        await prisma.doctorProfile.update({
+          where: { id: d.id },
+          data: { mdcnNumber: digits },
+        });
+      }
+    }
+    console.log("Demo data already present — MDCN backfilled if missing.");
     return;
   }
 
@@ -67,9 +77,11 @@ async function main() {
     city: string;
     area: string;
     label: string;
+    mdcn: string;
   }> = [
     {
       email: "amaka.eze@docnear.ng",
+      mdcn: "441102",
       name: "Dr Amaka Eze",
       phone: "+2348021110001",
       specialty: "General Practice",
@@ -85,6 +97,7 @@ async function main() {
     },
     {
       email: "tunde.balogun@docnear.ng",
+      mdcn: "441118",
       name: "Dr Tunde Balogun",
       phone: "+2348021110002",
       specialty: "Emergency Medicine",
@@ -100,6 +113,7 @@ async function main() {
     },
     {
       email: "nkechi.okoro@docnear.ng",
+      mdcn: "441203",
       name: "Dr Nkechi Okoro",
       phone: "+2348021110003",
       specialty: "Paediatrics",
@@ -115,6 +129,7 @@ async function main() {
     },
     {
       email: "fatima.sule@docnear.ng",
+      mdcn: "441277",
       name: "Dr Fatima Sule",
       phone: "+2348021110004",
       specialty: "Obstetrics & Gynaecology",
@@ -130,6 +145,7 @@ async function main() {
     },
     {
       email: "ibrahim.lawal@docnear.ng",
+      mdcn: "441301",
       name: "Dr Ibrahim Lawal",
       phone: "+2348021110005",
       specialty: "Internal Medicine",
@@ -145,6 +161,7 @@ async function main() {
     },
     {
       email: "yetunde.adebayo@docnear.ng",
+      mdcn: "441355",
       name: "Dr Yetunde Adebayo",
       phone: "+2348021110006",
       specialty: "Dermatology",
@@ -160,6 +177,7 @@ async function main() {
     },
     {
       email: "chuka.nwafor@docnear.ng",
+      mdcn: "441402",
       name: "Dr Chuka Nwafor",
       phone: "+2348021110007",
       specialty: "Orthopaedics",
@@ -175,6 +193,7 @@ async function main() {
     },
     {
       email: "zainab.musa@docnear.ng",
+      mdcn: "552019",
       name: "Dr Zainab Musa",
       phone: "+2348092220001",
       specialty: "Family Medicine",
@@ -190,6 +209,7 @@ async function main() {
     },
     {
       email: "paul.okoye@docnear.ng",
+      mdcn: "552088",
       name: "Dr Paul Okoye",
       phone: "+2348092220002",
       specialty: "Cardiology",
@@ -205,6 +225,7 @@ async function main() {
     },
     {
       email: "halima.bello@docnear.ng",
+      mdcn: "552141",
       name: "Dr Halima Bello",
       phone: "+2348092220003",
       specialty: "Psychiatry",
@@ -220,6 +241,7 @@ async function main() {
     },
     {
       email: "emeka.nwosu@docnear.ng",
+      mdcn: "663011",
       name: "Dr Emeka Nwosu",
       phone: "+2348033330001",
       specialty: "Emergency Medicine",
@@ -235,6 +257,7 @@ async function main() {
     },
     {
       email: "blessing.dike@docnear.ng",
+      mdcn: "663044",
       name: "Dr Blessing Dike",
       phone: "+2348033330002",
       specialty: "Paediatrics",
@@ -270,6 +293,7 @@ async function main() {
             city: d.city,
             area: d.area,
             locationLabel: d.label,
+            mdcnNumber: d.mdcn,
           },
         },
         wallet: { create: {} },

@@ -1,6 +1,6 @@
 import { requireDoctor } from "@/lib/auth";
 import { getDoctorForSession } from "@/lib/doctors";
-import { AREA_PRESETS } from "@/lib/geo";
+import { LAGOS_PRESETS } from "@/lib/geo";
 import { koboToNaira } from "@/lib/money";
 import { AppShell } from "@/components/AppShell";
 import { Disclaimer } from "@/components/Disclaimer";
@@ -10,8 +10,8 @@ export default async function DoctorProfilePage() {
   const user = await requireDoctor();
   const profile = await getDoctorForSession(user);
   const preset =
-    AREA_PRESETS.find((a) => a.city === profile.city && a.area === profile.area)?.id ||
-    AREA_PRESETS.find((a) => a.city === profile.city)?.id ||
+    LAGOS_PRESETS.find((a) => a.city === profile.city && a.area === profile.area)?.id ||
+    LAGOS_PRESETS.find((a) => a.city === profile.city)?.id ||
     "lagos-ikeja";
 
   return (
@@ -28,6 +28,7 @@ export default async function DoctorProfilePage() {
           yearsExperience: profile.yearsExperience,
           feeNaira: koboToNaira(profile.consultFeeKobo),
           presetId: preset,
+          mdcnNumber: profile.mdcnNumber,
         }}
       />
     </AppShell>

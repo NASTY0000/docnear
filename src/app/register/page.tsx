@@ -5,7 +5,7 @@ import Link from "next/link";
 import { registerAction } from "@/app/actions/auth";
 import { Logo } from "@/components/Logo";
 import { SPECIALTIES } from "@/lib/constants";
-import { AREA_PRESETS } from "@/lib/geo";
+import { AREA_PRESETS, LAGOS_PRESETS, LAUNCH_CITY } from "@/lib/geo";
 
 export default function RegisterPage() {
   const [role, setRole] = useState<"PATIENT" | "DOCTOR">("PATIENT");
@@ -44,10 +44,10 @@ export default function RegisterPage() {
           <input className="input" id="password" name="password" type="password" minLength={8} required />
         </div>
         <div>
-          <label className="label" htmlFor="presetId">{role === "DOCTOR" ? "Practice area" : "Your area (optional)"}</label>
+          <label className="label" htmlFor="presetId">{role === "DOCTOR" ? "Practice area (Lagos)" : "Your area (optional)"}</label>
           <select className="input" id="presetId" name="presetId" required={role === "DOCTOR"} defaultValue={role === "DOCTOR" ? "lagos-ikeja" : ""}>
             {role === "PATIENT" ? <option value="">Set later</option> : null}
-            {AREA_PRESETS.map((a) => (
+            {(role === "DOCTOR" ? LAGOS_PRESETS : AREA_PRESETS).map((a) => (
               <option key={a.id} value={a.id}>{a.label}</option>
             ))}
           </select>
@@ -69,6 +69,12 @@ export default function RegisterPage() {
             <div>
               <label className="label" htmlFor="feeNaira">Consult fee (NGN)</label>
               <input className="input" id="feeNaira" name="feeNaira" type="number" min={1000} defaultValue={5000} />
+            </div>
+            <p className="text-xs text-ink-700/70 dark:text-tide-400">DocNear is live in {LAUNCH_CITY}. Abuja and Port Harcourt are next.</p>
+            <div>
+              <label className="label" htmlFor="mdcnNumber">MDCN registration number</label>
+              <input className="input" id="mdcnNumber" name="mdcnNumber" required placeholder="e.g. 123456" autoComplete="off" />
+              <p className="mt-1 text-xs text-ink-700/70 dark:text-tide-400">We collect this now. Full licence checks come next.</p>
             </div>
             <div>
               <label className="label" htmlFor="bio">Bio</label>

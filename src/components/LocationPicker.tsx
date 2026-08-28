@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { saveLocationAction } from "@/app/actions/location";
-import { AREA_PRESETS, CITIES } from "@/lib/geo";
+import { AREA_PRESETS, CITIES, LAUNCH_CITY } from "@/lib/geo";
 
 type State = { error?: string; ok?: boolean } | null;
 
@@ -38,8 +38,11 @@ export function LocationPicker({
       <div>
         <h2 className="font-display text-xl">Your location</h2>
         <p className="text-sm text-ink-700 dark:text-tide-300">
-          {currentLabel ? `Currently: ${currentLabel}` : "Set a pin or choose a city/area to see nearby doctors."}
+          {currentLabel ? `Currently: ${currentLabel}` : "Set a pin or choose a Lagos area to see nearby doctors."}
         </p>
+        {city !== LAUNCH_CITY ? (
+          <p className="mt-2 text-sm text-coral-800 dark:text-coral-200">DocNear lists doctors in Lagos first. You can still pin {city} for later.</p>
+        ) : null}
       </div>
       <form action={action} className="space-y-3">
         <div>
@@ -47,7 +50,7 @@ export function LocationPicker({
           <select id="city" className="input" value={city} onChange={(e) => setCity(e.target.value)}>
             {CITIES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {c === LAUNCH_CITY ? c : `${c} (coming next)`}
               </option>
             ))}
           </select>

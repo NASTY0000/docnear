@@ -23,6 +23,7 @@ export default async function DoctorDashboard() {
       <h1 className="font-display text-3xl">Doctor desk</h1>
       <p className="text-sm text-ink-700 dark:text-tide-300">
         {profile.specialty} · {profile.locationLabel} · {formatNGN(profile.consultFeeKobo)} / session
+        {profile.mdcnNumber ? ` · MDCN ${profile.mdcnNumber}` : ""}
       </p>
       <div className="mt-4">
         <Disclaimer compact />

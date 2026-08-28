@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { LAUNCH_CITY } from "./geo";
 import { formatDistance, geoUrl, mapsNavigateUrl, sortByDistance } from "./distance";
 import { DomainError } from "./errors";
 
@@ -8,9 +9,9 @@ export async function listEmergency(lat: number, lng: number) {
   }
 
   const [hospitals, doctors] = await Promise.all([
-    prisma.hospital.findMany({ where: { emergencyCapable: true } }),
+    prisma.hospital.findMany({ where: { emergencyCapable: true, city: LAUNCH_CITY } }),
     prisma.doctorProfile.findMany({
-      where: { status: "ONLINE" },
+      where: { status: "ONLINE", city: LAUNCH_CITY },
       include: { user: { select: { id: true, name: true, phone: true } } },
     }),
   ]);

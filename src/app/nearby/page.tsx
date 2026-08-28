@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requirePatient } from "@/lib/auth";
 import { SPECIALTIES } from "@/lib/constants";
+import { LAUNCH_CITY } from "@/lib/geo";
 import { listNearbyDoctors } from "@/lib/doctors";
 import { getPatientLocation } from "@/lib/location";
 import { AppShell } from "@/components/AppShell";
@@ -56,6 +57,12 @@ export default async function NearbyPage({
         <Disclaimer compact />
       </div>
 
+      {loc?.city && loc.city !== LAUNCH_CITY ? (
+        <p className="mt-4 rounded-xl border border-coral-200 bg-coral-50 px-3 py-2 text-sm text-coral-900 dark:border-coral-800 dark:bg-coral-950/40 dark:text-coral-100">
+          DocNear lists doctors in Lagos first. {loc.city} is next. Emergency 112 still works anywhere.
+        </p>
+      ) : null}
+
       {loc?.lat != null && loc?.lng != null ? (
         <div className="mt-4">
           <OsmMap lat={loc.lat} lng={loc.lng} title={`Your area — ${loc.locationLabel}`} />
@@ -89,7 +96,7 @@ export default async function NearbyPage({
           </div>
           <div className="mt-4 grid gap-3">
             {doctors.length === 0 ? (
-              <p className="text-sm">No doctors match those filters. Try All specialties or another area.</p>
+              <p className="text-sm">No Lagos doctors match those filters. Try Available now or another Lagos area.</p>
             ) : (
               doctors.map((d) => (
                 <DoctorCard key={d.id} doctor={d} href={`/doctors/${d.id}`} />
